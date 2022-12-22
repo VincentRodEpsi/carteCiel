@@ -32,9 +32,9 @@ export default {
   data() {
     return {
       default_size: 50,
-      near_stars: null,
-      bright_stars: null,
-      hot_stars: null,
+      near_stars: undefined,
+      bright_stars: undefined,
+      hot_stars: undefined,
     };
   },
   mounted() {

@@ -64,8 +64,8 @@ export default {
   data() {
     return {
       slice: this.size,
-      slice_array: null,
-      raw_array: null,
+      slice_array: undefined,
+      raw_array: undefined,
     };
   },
   methods: {
