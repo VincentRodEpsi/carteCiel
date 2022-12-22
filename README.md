@@ -1,5 +1,10 @@
 # carte_ciel
 
+Version hebergée disponible sur : https://skymap.yanis-petit.fr/
+
+## Projet cours Agilité
+Vue.js
+
 ## Project setup
 ```
 npm install
