@@ -1,6 +1,6 @@
 # carte_ciel
 
-Version hebergè disponible sur : (https://skymap.yanis-petit.fr/skymap)
+Version hebergée disponible sur : https://skymap.yanis-petit.fr/
 
 ## Projet cours Agilité
 Vue.js
