@@ -18,16 +18,20 @@
       :array="hot_stars"
     />
   </article>
+
+  <Map />
 </template>
 
 <script>
 import dataset from "@/assets/json/stars.json";
 import Table from "@/components/Table.vue";
+import Map from "@/components/Map.vue";
 
 export default {
   name: "App",
   components: {
     Table,
+    Map,
   },
   data() {
     return {
@@ -87,7 +91,7 @@ body {
 }
 
 article {
-  margin: 1.4rem;
+  margin: 1.4rem 1.4rem 2rem;
   display: flex;
   flex-direction: column;
   gap: 2.4rem;
