@@ -29,11 +29,15 @@ export default {
       this.scene = new THREE.Scene();
 
       const geometry = new THREE.SphereGeometry(0.2, 26, 26);
-      const material = new THREE.MeshNormalMaterial();
+      //const material = new THREE.MeshNormalMaterial();
 
       for (const star of dataset) {
-        let mesh = new THREE.Mesh(geometry, material);
+        let mesh = new THREE.Mesh(
+          geometry,
+          new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff })
+        );
         mesh.position.set(star.x, star.y, star.z);
+        mesh.userData = star;
         this.scene.add(mesh);
       }
 
