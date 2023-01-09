@@ -46,16 +46,38 @@ export default {
       const light = new THREE.AmbientLight(0xffffff, 2);
       this.scene.add(light);
 
-      const geometry = new THREE.SphereGeometry(0.2, 26, 26);
-      //const material = new THREE.MeshNormalMaterial();
+      const geometry = new THREE.SphereGeometry(0.2, 22, 22);
 
-      for (const star of dataset) {
-        let mesh = new THREE.Mesh(
-          geometry,
-          new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff })
+      let mag = dataset.map((a) => a.mag);
+      mag = mag.map(this.normalize(-1, 6));
+
+      for (const index in dataset) {
+        let mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial());
+        mesh.position.set(dataset[index].x, dataset[index].y, dataset[index].z);
+        mesh.scale.set(
+          dataset[index].dist / 40,
+          dataset[index].dist / 40,
+          dataset[index].dist / 40
         );
-        mesh.position.set(star.x, star.y, star.z);
-        mesh.userData = star;
+        const ci = dataset[index].ci;
+        if (ci < 0) {
+          mesh.material.color = new THREE.Color("rgb(255,98,80)");
+        } else if (ci < 0.2) {
+          mesh.material.color = new THREE.Color("rgb(255,174,77)");
+        } else if (ci < 0.5) {
+          mesh.material.color = new THREE.Color("rgb(255,246,125)");
+        } else if (ci < 1) {
+          mesh.material.color = new THREE.Color("rgb(248,255,190)");
+        } else if (ci < 1.5) {
+          mesh.material.color = new THREE.Color("rgb(190,255,228)");
+        } else if (ci < 2) {
+          mesh.material.color = new THREE.Color("rgb(111,255,221)");
+        } else {
+          mesh.material.color = new THREE.Color("rgb(72,221,255)");
+        }
+        mesh.material.transparent = true;
+        mesh.material.opacity = mag[index];
+        mesh.userData = dataset[index];
         this.scene.add(mesh);
       }
 
@@ -128,8 +150,26 @@ export default {
     },
     onDocumentClick() {
       if (this.intersected) {
-        alert(JSON.stringify(this.intersected.userData));
+        let message = `
+          bf: "${this.intersected.userData.bf}"\n
+          ci: ${this.intersected.userData.ci}\n
+          dist: ${this.intersected.userData.dist}\n
+          id: ${this.intersected.userData.id}\n
+          lum: ${this.intersected.userData.lum}\n
+          mag: ${this.intersected.userData.mag}\n
+          proper: "${this.intersected.userData.proper}"\n
+          x: ${this.intersected.userData.x}\n
+          y: ${this.intersected.userData.y}\n
+          z: ${this.intersected.userData.z}
+        `;
+        alert(message);
       }
+    },
+    normalize(min, max) {
+      let delta = max - min;
+      return function (val) {
+        return (val - min) / delta;
+      };
     },
   },
   mounted() {
