@@ -12,6 +12,19 @@ export default {
   data() {
     return {
       container: undefined,
+      intersected: undefined,
+      star: {
+        bf: "",
+        ci: 0,
+        dist: 0,
+        id: 0,
+        lum: 0,
+        mag: "",
+        proper: "",
+        x: 0,
+        y: 0,
+        z: 0,
+      },
     };
   },
   methods: {
@@ -27,6 +40,11 @@ export default {
       this.camera.position.set(0, 0, 0);
 
       this.scene = new THREE.Scene();
+      this.pointer = new THREE.Vector2();
+      this.raycaster = new THREE.Raycaster();
+
+      const light = new THREE.AmbientLight(0xffffff, 2);
+      this.scene.add(light);
 
       const geometry = new THREE.SphereGeometry(0.2, 26, 26);
       //const material = new THREE.MeshNormalMaterial();
@@ -57,6 +75,33 @@ export default {
     },
     animate() {
       requestAnimationFrame(this.animate);
+
+      this.raycaster.setFromCamera(this.pointer, this.camera);
+      const intersects = this.raycaster.intersectObjects(
+        this.scene.children,
+        false
+      );
+      if (intersects.length > 0) {
+        if (this.intersected !== intersects[0].object) {
+          if (this.intersected) {
+            this.intersected.material.emissive.setHex(
+              this.intersected.currentHex
+            );
+          }
+          this.intersected = intersects[0].object;
+          this.intersected.currentHex =
+            this.intersected.material.emissive.getHex();
+          this.intersected.material.emissive.setHex(0xffffff);
+        }
+      } else {
+        if (this.intersected) {
+          this.intersected.material.emissive.setHex(
+            this.intersected.currentHex
+          );
+        }
+        this.intersected = undefined;
+      }
+
       this.renderer.render(this.scene, this.camera);
       this.controls.update();
     },
@@ -77,15 +122,28 @@ export default {
       this.camera.fov = Math.max(Math.min(this.camera.fov, fovMAX), fovMIN);
       this.camera.updateProjectionMatrix();
     },
+    onDocumentMouseMove(event) {
+      this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+      this.pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    },
+    onDocumentClick() {
+      if (this.intersected) {
+        alert(JSON.stringify(this.intersected.userData));
+      }
+    },
   },
   mounted() {
     this.init();
     this.animate();
     window.addEventListener("resize", this.onWindowResize);
+    document.addEventListener("mousemove", this.onDocumentMouseMove);
     document.addEventListener("mousewheel", this.onDocumentMouseWheel);
+    document.addEventListener("click", this.onDocumentClick);
   },
   beforeUnmount() {
+    document.removeEventListener("click", this.onDocumentClick);
     document.removeEventListener("mousewheel", this.onDocumentMouseWheel);
+    document.removeEventListener("mousemove", this.onDocumentMouseMove);
     window.removeEventListener("resize", this.onWindowResize);
   },
 };
