@@ -46,6 +46,18 @@ export default {
       const light = new THREE.AmbientLight(0xffffff, 2);
       this.scene.add(light);
 
+      const path = "/img/dark-s_";
+      const format = ".jpg";
+      const urls = [
+        path + "px" + format,
+        path + "nx" + format,
+        path + "py" + format,
+        path + "ny" + format,
+        path + "pz" + format,
+        path + "nz" + format,
+      ];
+      this.scene.background = new THREE.CubeTextureLoader().load(urls);
+
       const geometry = new THREE.SphereGeometry(0.2, 22, 22);
 
       let mag = dataset.map((a) => a.mag);
@@ -191,7 +203,7 @@ export default {
 
 <style lang="scss" scoped>
 #threejs {
-  width: 100%;
   height: 100vh;
+  width: 100%;
 }
 </style>
