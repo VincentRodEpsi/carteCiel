@@ -1,5 +1,5 @@
 <template>
-  <article>
+  <!--<article>
     <Table
       title="Étoiles les plus proches de la terre"
       :size="default_size"
@@ -17,17 +17,21 @@
       :size="default_size"
       :array="hot_stars"
     />
-  </article>
+  </article>-->
+
+  <Map />
 </template>
 
 <script>
 import dataset from "@/assets/json/stars.json";
-import Table from "@/components/Table.vue";
+//import Table from "@/components/Table.vue";
+import Map from "@/components/Map.vue";
 
 export default {
   name: "App",
   components: {
-    Table,
+    //Table,
+    Map,
   },
   data() {
     return {
@@ -87,7 +91,7 @@ body {
 }
 
 article {
-  margin: 1.4rem;
+  margin: 1.4rem 1.4rem 2rem;
   display: flex;
   flex-direction: column;
   gap: 2.4rem;
