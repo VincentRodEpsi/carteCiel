@@ -9,6 +9,12 @@ import { OrbitControls } from "three/addons/controls/OrbitControls";
 
 export default {
   name: "MapComponent",
+  props: {
+    distance: {
+      type: Number,
+      default: 0,
+    },
+  },
   data() {
     return {
       container: undefined,
@@ -199,6 +205,11 @@ export default {
     document.removeEventListener("mousewheel", this.onDocumentMouseWheel);
     document.removeEventListener("mousemove", this.onDocumentMouseMove);
     window.removeEventListener("resize", this.onWindowResize);
+  },
+  watch: {
+    distance(value) {
+      this.camera.position.set(0, 0, value);
+    },
   },
 };
 </script>
