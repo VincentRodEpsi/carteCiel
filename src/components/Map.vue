@@ -160,9 +160,10 @@ export default {
       this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
       this.pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
     },
-    onDocumentClick() {
-      if (this.intersected) {
-        let message = `
+    onDocumentClick(event) {
+      if (event.target.tagName === "CANVAS") {
+        if (this.intersected) {
+          let message = `
           bf: "${this.intersected.userData.bf}"\n
           ci: ${this.intersected.userData.ci}\n
           dist: ${this.intersected.userData.dist}\n
@@ -174,7 +175,8 @@ export default {
           y: ${this.intersected.userData.y}\n
           z: ${this.intersected.userData.z}
         `;
-        alert(message);
+          alert(message);
+        }
       }
     },
     normalize(min, max) {
