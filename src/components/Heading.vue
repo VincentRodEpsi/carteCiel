@@ -2,15 +2,17 @@
   <header>
     <section>
       <form @submit.prevent>
-        <label for="name">Rechercher une étoile : </label>
-        <input id="name" name="name" type="text" />
-      </form>
-    </section>
-    <section>
-      <form @submit.prevent>
         <div>
           <label for="near_nb">Étoiles distantes : </label>
-          <input id="near_nb" v-model="near_nb" name="near_nb" type="range" />
+          <input
+            id="near_nb"
+            v-model="near_nb"
+            max="1000"
+            min="0"
+            name="near_nb"
+            step="1"
+            type="range"
+          />
           <span>{{ near_nb }}</span>
         </div>
         <div>
@@ -18,14 +20,25 @@
           <input
             id="bright_nb"
             v-model="bright_nb"
+            max="1000"
+            min="0"
             name="bright_nb"
+            step="1"
             type="range"
           />
           <span>{{ bright_nb }}</span>
         </div>
         <div>
           <label for="hot_nb">Étoiles chaudes : </label>
-          <input id="hot_nb" v-model="hot_nb" name="hot_nb" type="range" />
+          <input
+            id="hot_nb"
+            v-model="hot_nb"
+            max="1000"
+            min="0"
+            name="hot_nb"
+            step="1"
+            type="range"
+          />
           <span>{{ hot_nb }}</span>
         </div>
       </form>
@@ -38,20 +51,29 @@ export default {
   name: "HeadingComponent",
   data() {
     return {
-      near_nb: 0,
-      bright_nb: 0,
-      hot_nb: 0,
+      near_nb: 100,
+      bright_nb: 100,
+      hot_nb: 100,
     };
   },
   watch: {
-    near_nb(value) {
-      this.$emit("near", value);
+    near_nb: {
+      handler(value) {
+        this.$emit("near", value);
+      },
+      immediate: true,
     },
-    bright_nb(value) {
-      this.$emit("bright", value);
+    bright_nb: {
+      handler(value) {
+        this.$emit("bright", value);
+      },
+      immediate: true,
     },
-    hot_nb(value) {
-      this.$emit("hot", value);
+    hot_nb: {
+      handler(value) {
+        this.$emit("hot", value);
+      },
+      immediate: true,
     },
   },
 };
@@ -65,7 +87,7 @@ header {
   display: flex;
   flex-flow: row nowrap;
   gap: 1rem;
-  justify-content: space-between;
+  justify-content: center;
   left: 0;
   padding: 1rem;
   pointer-events: all;
@@ -79,8 +101,9 @@ header {
       align-items: center;
       display: flex;
       flex-flow: row nowrap;
-      gap: 1rem;
-      justify-content: flex-start;
+      gap: 6rem;
+      justify-content: center;
+      width: 100%;
 
       input[type="text"] {
         border: 1px solid #ccc;
@@ -101,10 +124,6 @@ header {
           width: 20px;
         }
       }
-    }
-
-    &:last-of-type > form {
-      gap: 2rem;
     }
   }
 }

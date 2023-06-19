@@ -20,7 +20,7 @@
   </article>-->
 
   <Heading @bright="setBright" @hot="setHot" @near="setNear" />
-  <Map />
+  <Map :dataset="array" />
 </template>
 
 <script>
@@ -36,40 +36,58 @@ export default {
     Heading,
     Map,
   },
+  computed: {
+    array() {
+      if (this.near_stars && this.bright_stars && this.hot_stars) {
+        return this.removeDuplicatesById([
+          ...this.near_stars,
+          ...this.bright_stars,
+          ...this.hot_stars,
+        ]);
+      }
+      return [];
+    },
+  },
   data() {
     return {
       default_size: 50,
       near_stars: undefined,
       bright_stars: undefined,
       hot_stars: undefined,
-      bright_nb: null,
-      hot_nb: null,
-      near_nb: null,
     };
   },
-  mounted() {
-    this.near_stars = this.sortData("dist");
-    this.bright_stars = this.sortData("lum", true);
-    this.hot_stars = this.sortData("ci", true);
-  },
   methods: {
-    sortData(sortBy, desc = false) {
+    setBright(value) {
+      this.bright_stars = this.sortData("lum", value, true);
+    },
+    setHot(value) {
+      this.hot_stars = this.sortData("ci", value, true);
+    },
+    setNear(value) {
+      this.near_stars = this.sortData("dist", value);
+    },
+    sortData(sortBy, nb, desc = false) {
       let sort = [-1, 1];
       if (desc) sort = [1, -1];
       return dataset
         .sort((a, b) =>
           a[sortBy] < b[sortBy] ? sort[0] : a[sortBy] > b[sortBy] ? sort[1] : 0
         )
-        .slice();
+        .slice(0, nb);
     },
-    setBright(value) {
-      this.bright_nb = parseInt(value);
-    },
-    setHot(value) {
-      this.hot_nb = parseInt(value);
-    },
-    setNear(value) {
-      this.near_nb = parseInt(value);
+    removeDuplicatesById(arr) {
+      const uniqueObjects = {};
+      const result = [];
+
+      for (let obj of arr) {
+        const id = obj.id;
+        if (!uniqueObjects[id]) {
+          uniqueObjects[id] = true;
+          result.push(obj);
+        }
+      }
+
+      return result;
     },
   },
 };
@@ -101,7 +119,7 @@ body {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow: overlay;
+  overflow: hidden;
   scroll-behavior: smooth;
 }
 
