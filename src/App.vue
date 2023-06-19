@@ -19,8 +19,9 @@
     />
   </article>-->
 
+  <Popup v-if="star" :star="star" @close="resetStar" />
   <Heading @bright="setBright" @hot="setHot" @near="setNear" />
-  <Map :dataset="array" />
+  <Map :dataset="array" @select="setStar" />
 </template>
 
 <script>
@@ -28,6 +29,7 @@ import dataset from "@/assets/json/stars.json";
 //import Table from "@/components/Table.vue";
 import Heading from "@/components/Heading.vue";
 import Map from "@/components/Map.vue";
+import Popup from "@/components/Popup.vue";
 
 export default {
   name: "App",
@@ -35,6 +37,7 @@ export default {
     //Table,
     Heading,
     Map,
+    Popup,
   },
   computed: {
     array() {
@@ -54,6 +57,7 @@ export default {
       near_stars: undefined,
       bright_stars: undefined,
       hot_stars: undefined,
+      star: false,
     };
   },
   methods: {
@@ -65,6 +69,13 @@ export default {
     },
     setNear(value) {
       this.near_stars = this.sortData("dist", value);
+    },
+    setStar(value) {
+      console.log(value);
+      this.star = value;
+    },
+    resetStar() {
+      this.star = false;
     },
     sortData(sortBy, nb, desc = false) {
       let sort = [-1, 1];

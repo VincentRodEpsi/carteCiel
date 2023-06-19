@@ -127,19 +127,8 @@ export default {
     onDocumentClick(event) {
       if (event.target.tagName === "CANVAS") {
         if (this.intersected) {
-          let message = `
-          bf: "${this.intersected.userData.bf}"\n
-          ci: ${this.intersected.userData.ci}\n
-          dist: ${this.intersected.userData.dist}\n
-          id: ${this.intersected.userData.id}\n
-          lum: ${this.intersected.userData.lum}\n
-          mag: ${this.intersected.userData.mag}\n
-          proper: "${this.intersected.userData.proper}"\n
-          x: ${this.intersected.userData.x}\n
-          y: ${this.intersected.userData.y}\n
-          z: ${this.intersected.userData.z}
-        `;
-          alert(message);
+          console.log(this.intersected.userData);
+          this.$emit("select", this.intersected.userData);
         }
       }
     },
