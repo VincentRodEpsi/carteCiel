@@ -4,27 +4,24 @@
 
 <script>
 import * as THREE from "three";
-import dataset from "@/assets/json/stars.json";
 import { OrbitControls } from "three/addons/controls/OrbitControls";
 
 export default {
   name: "MapComponent",
+  props: {
+    distance: {
+      type: Number,
+      default: 0,
+    },
+    dataset: {
+      type: Array,
+      required: true,
+    },
+  },
   data() {
     return {
       container: undefined,
       intersected: undefined,
-      star: {
-        bf: "",
-        ci: 0,
-        dist: 0,
-        id: 0,
-        lum: 0,
-        mag: "",
-        proper: "",
-        x: 0,
-        y: 0,
-        z: 0,
-      },
     };
   },
   methods: {
@@ -58,40 +55,7 @@ export default {
       ];
       this.scene.background = new THREE.CubeTextureLoader().load(urls);
 
-      const geometry = new THREE.SphereGeometry(0.2, 22, 22);
-
-      let mag = dataset.map((a) => a.mag);
-      mag = mag.map(this.normalize(-1, 6));
-
-      for (const index in dataset) {
-        let mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial());
-        mesh.position.set(dataset[index].x, dataset[index].y, dataset[index].z);
-        mesh.scale.set(
-          dataset[index].dist / 40,
-          dataset[index].dist / 40,
-          dataset[index].dist / 40
-        );
-        const ci = dataset[index].ci;
-        if (ci < 0) {
-          mesh.material.color = new THREE.Color("rgb(255,98,80)");
-        } else if (ci < 0.2) {
-          mesh.material.color = new THREE.Color("rgb(255,174,77)");
-        } else if (ci < 0.5) {
-          mesh.material.color = new THREE.Color("rgb(255,246,125)");
-        } else if (ci < 1) {
-          mesh.material.color = new THREE.Color("rgb(248,255,190)");
-        } else if (ci < 1.5) {
-          mesh.material.color = new THREE.Color("rgb(190,255,228)");
-        } else if (ci < 2) {
-          mesh.material.color = new THREE.Color("rgb(111,255,221)");
-        } else {
-          mesh.material.color = new THREE.Color("rgb(72,221,255)");
-        }
-        mesh.material.transparent = true;
-        mesh.material.opacity = mag[index];
-        mesh.userData = dataset[index];
-        this.scene.add(mesh);
-      }
+      this.populateScene();
 
       this.renderer = new THREE.WebGLRenderer({ antialias: true });
       this.renderer.setSize(
@@ -160,21 +124,12 @@ export default {
       this.pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
       this.pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
     },
-    onDocumentClick() {
-      if (this.intersected) {
-        let message = `
-          bf: "${this.intersected.userData.bf}"\n
-          ci: ${this.intersected.userData.ci}\n
-          dist: ${this.intersected.userData.dist}\n
-          id: ${this.intersected.userData.id}\n
-          lum: ${this.intersected.userData.lum}\n
-          mag: ${this.intersected.userData.mag}\n
-          proper: "${this.intersected.userData.proper}"\n
-          x: ${this.intersected.userData.x}\n
-          y: ${this.intersected.userData.y}\n
-          z: ${this.intersected.userData.z}
-        `;
-        alert(message);
+    onDocumentClick(event) {
+      if (event.target.tagName === "CANVAS") {
+        if (this.intersected) {
+          console.log(this.intersected.userData);
+          this.$emit("select", this.intersected.userData);
+        }
       }
     },
     normalize(min, max) {
@@ -182,6 +137,55 @@ export default {
       return function (val) {
         return (val - min) / delta;
       };
+    },
+    populateScene() {
+      this.clearScene();
+
+      if (this.dataset.length === 0) return;
+      const geometry = new THREE.SphereGeometry(0.2, 22, 22);
+
+      let mag = this.dataset.map((a) => a.mag);
+      mag = mag.map(this.normalize(-1, 6));
+
+      for (const index in this.dataset) {
+        let mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial());
+        mesh.position.set(
+          this.dataset[index].x,
+          this.dataset[index].y,
+          this.dataset[index].z
+        );
+        mesh.scale.set(
+          this.dataset[index].dist / 40,
+          this.dataset[index].dist / 40,
+          this.dataset[index].dist / 40
+        );
+        const ci = this.dataset[index].ci;
+        if (ci < 0) {
+          mesh.material.color = new THREE.Color("rgb(255,98,80)");
+        } else if (ci < 0.2) {
+          mesh.material.color = new THREE.Color("rgb(255,174,77)");
+        } else if (ci < 0.5) {
+          mesh.material.color = new THREE.Color("rgb(255,246,125)");
+        } else if (ci < 1) {
+          mesh.material.color = new THREE.Color("rgb(248,255,190)");
+        } else if (ci < 1.5) {
+          mesh.material.color = new THREE.Color("rgb(190,255,228)");
+        } else if (ci < 2) {
+          mesh.material.color = new THREE.Color("rgb(111,255,221)");
+        } else {
+          mesh.material.color = new THREE.Color("rgb(72,221,255)");
+        }
+        mesh.material.transparent = true;
+        mesh.material.opacity = mag[index];
+        mesh.userData = this.dataset[index];
+        this.scene.add(mesh);
+      }
+    },
+    clearScene() {
+      for (let i = this.scene.children.length - 1; i >= 0; i--) {
+        if (this.scene.children[i].type === "Mesh")
+          this.scene.remove(this.scene.children[i]);
+      }
     },
   },
   mounted() {
@@ -197,6 +201,17 @@ export default {
     document.removeEventListener("mousewheel", this.onDocumentMouseWheel);
     document.removeEventListener("mousemove", this.onDocumentMouseMove);
     window.removeEventListener("resize", this.onWindowResize);
+  },
+  watch: {
+    distance(value) {
+      this.camera.position.set(0, 0, value);
+    },
+    dataset: {
+      handler() {
+        this.populateScene();
+      },
+      deep: true,
+    },
   },
 };
 </script>
